@@ -130,7 +130,13 @@ STATIC bool indev_read(lv_indev_data_t *data)
             mp_obj_new_exception_msg(
                 &mp_type_RuntimeError, MP_ERROR_TEXT("indev instance needs to be created before callback is called!")));
 
-    mp_obj_t mp_ptr = NEW_PTR_OBJ(lv_indev_data_t, data);
+	// This does not compile on Windows: mp_obj_t mp_ptr = NEW_PTR_OBJ(lv_indev_data_t, data); 
+    DEFINE_PTR_OBJ_TYPE(ptr_obj_type, MP_QSTR_lv_indev_data_t);
+    mp_ptr_t *nself = m_new_obj(mp_ptr_t);
+    nself->base.type = &ptr_obj_type;
+    nself->ptr = data;
+    mp_obj_t mp_ptr = MP_OBJ_FROM_PTR(nself);
+
     mp_obj_t mp_return_value = mp_call_function_n_kw(self->callback, 1, 0, &mp_ptr);
     return mp_obj_is_true(mp_return_value);
 }
