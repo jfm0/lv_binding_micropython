@@ -47,7 +47,7 @@ STATIC int tick_thread(void * data)
 #ifndef _WIN32
         pthread_kill(mp_thread, SIGUSR1); // interrupt REPL blocking input. See handle_sigusr1
 #else
-        raise(SIGTERM);
+        //todo?
 #endif
     }
 
@@ -106,8 +106,7 @@ STATIC mp_obj_t mp_init_SDL(size_t n_args, const mp_obj_t *pos_args, mp_map_t *k
             exit(1);
         }
 #else
-        // "The SIGILL and SIGTERM signals are not generated under Windows"
-        signal(SIGTERM, handle_sigusr1);
+        // todo?
 #endif
     }
 
