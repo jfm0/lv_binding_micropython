@@ -4,7 +4,9 @@
 #endif
 #include <errno.h>
 #include <signal.h>
+#ifndef _WIN32
 #include <pthread.h>
+#endif
 #include "SDL_monitor.h"
 #include "SDL_mouse.h"
 #ifdef __EMSCRIPTEN__
@@ -18,7 +20,9 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
+#ifndef _WIN32
 STATIC pthread_t mp_thread;
+#endif
 
 STATIC mp_obj_t mp_refresh_SDL()
 {
@@ -46,8 +50,6 @@ STATIC int tick_thread(void * data)
         mp_sched_schedule((mp_obj_t)&mp_lv_task_handler_obj, mp_const_none);
 #ifndef _WIN32
         pthread_kill(mp_thread, SIGUSR1); // interrupt REPL blocking input. See handle_sigusr1
-#else
-        //todo?
 #endif
     }
 
@@ -94,9 +96,9 @@ STATIC mp_obj_t mp_init_SDL(size_t n_args, const mp_obj_t *pos_args, mp_map_t *k
     }
 #endif
 
+#ifndef _WIN32
     if (args[ARG_auto_refresh].u_bool) {
         mp_thread = pthread_self();
-#ifndef _WIN32
         struct sigaction sa;
         sa.sa_handler = handle_sigusr1;
         sa.sa_flags = 0;
@@ -105,10 +107,8 @@ STATIC mp_obj_t mp_init_SDL(size_t n_args, const mp_obj_t *pos_args, mp_map_t *k
             perror("sigaction");
             exit(1);
         }
-#else
-        // todo?
-#endif
     }
+#endif
 
     return mp_const_none;
 }
